@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TLP-1</title>
+<style>
+
+.form{  
+    margin: 5em auto 3em;  
+    width: 600px;  
+}  
+
+label
+{
+width: 4em;
+float: left;
+text-align: right;
+margin-right: 0.5em;
+display: block
+}
+
+.input{  
+    border: 1px solid #d0ccc9;  
+    background: #FFC;  
+    color: #5f95ef;  
+    font-size: 11px;  
+    font-weight: 700;  
+    padding-bottom: 2px;  
+}  
+
+.input.text{  
+    font-weight: normal;  
+    color: #565656;  
+    border: 1px solid #9c9c9c;  
+    width: 5px;  
+    padding: 2px;  
+    margin-bottom: 5px;  
+    text-align: left;  
+} 
+p.bigtext
+{
+	margin: 0;
+	font-size:120px;
+	color: #000;
+}
+p.medtext
+{
+	margin: 0;
+	font-size:80px;
+	color: #000;
+}
+p.smalltext
+{
+	margin: 0;
+	font-size:40px;
+	color: #000;
+}
+
+</style>
+</head>
+
+<body>
+<table width="780" border="0" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td colspan="2"><img src="tlog-header-780-60.png"  alt="" width="780" height="60"  title="Temperature Logging Platform" /></td>
+</tr>
+<tr>
+<td width="520" valign="top" style="color:#EEE; background-color:#DBD1DC;">
+	  <div id="id_tempdiv"><p class="bigtext">---.-&deg;C</p></div>
+      <div id="id_timediv"><p class="medtext">--:--:--</p></div>
+      <div id="id_state"><p class="smalltext">Select Mode</p></div>
+	
+</td>
+<td width="280" valign="center" style="color:#333; background-color:#CCF;">
+
+<table>
+
+
+<tr><td>&nbsp;</td></tr>
+<tr>
+  <td style="color:#EEE; background-color:#C00;">Mode Select</td></tr>
+
+<tr><td>
+	<label for="id_mode">Mode</label>
+	<input type="submit" class="button1" value="Live" id="id_livemode" />
+    <input type="submit" class="button1" value="Log" id="id_logmode" />
+    
+</td></tr>
+<tr><td>&nbsp;</td></tr>
+
+
+
+
+
+<tr>
+  <td style="color:#EEE; background-color:#C00;">Temperature Logger</td></tr>
+<tr><td>
+	<label for="id_period">Period</label>
+    <input type = "text" value ="1" name = "box_period" class="input" id="id_period"><br/>
+    <label for="id_file">File</label>
+    <input type = "text" value ="experiment1.csv" name = "box_file" class="input" id="id_file"><br/>
+	<label for="id_logstart">Log Start</label>
+	<input type="submit" class="button1" value="Go" id="id_logstart" /><br />
+    <label for="id_logstop">Log Stop</label>
+    <input type="submit" class="button1" value="Stop" id="id_logstop" /><br />
+</td></tr>
+
+<tr><td>&nbsp;</td></tr>
+<tr>
+  <td style="color:#EEE; background-color:#C00;">Download Log File</td></tr>
+
+<tr><td>
+	<div id="id_dl"></div>
+	
+    
+</td></tr>
+</table>
+    
+</td>
+</tr>
+<tr>
+<td colspan="2"><img src="tlog-footer-780-37.png"  alt="" width="780" height="37"  title="" /></td>
+</tr>
+</table>
+
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="/socket.io/socket.io.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+
+	var period_box = document.getElementById("id_period");
+	var file_box = document.getElementById("id_file");
+	var logstart_button = document.getElementById("id_logstart");
+	var logstop_button = document.getElementById("id_logstop");
+	var dl_div = document.getElementById("id_dl");
+	var temp_div = document.getElementById("id_tempdiv");
+	var time_div = document.getElementById("id_timediv");
+	var state_div = document.getElementById("id_state");
+	var livemode_button = document.getElementById("id_livemode");
+	var logmode_button = document.getElementById("id_logmode");
+	
+	var mode=0; // 0=idle, 1=live, 2=log
+	var recstate=0; // 0=unknown, 1=not logging, 2=logging
+	var rxfilename;
+	var a;
+
+
+$(document).ready(function() {		
+});
+
+jQuery(document).ready(function() {
+	
+  $("#id_marker").click(function(e){
+    do_erase_marker();
+  });
+  $("#id_cont").click(function(e){
+    do_trigmode(0);
+  });
+  $("#id_livemode").click(function(e){
+    do_livemode(0);
+  });
+  $("#id_logmode").click(function(e){
+    do_logmode(0);
+  });
+  $("#id_logstart").click(function(e){
+    do_logstart(0);
+  });
+ // $("#id_download").click(function(e){
+ //   do_download(0);
+ // });
+
+	logstart_button.disabled=true;
+	logstop_button.disabled=true;
+	livemode_button.style.background="#E6E6E6";
+	logmode_button.style.background="#E6E6E6";
+	set_download();
+  
+	
+});
+
+
+function clear_display()
+{
+	temp_div.innerHTML='<p class="bigtext">---.-&deg;C</p>';
+	time_div.innerHTML='<p class="medtext">--:--:--</p>';
+}
+
+function set_download()
+{
+	var fname=file_box.value;	
+	//var oldPath = document.URL;
+	//var newPath = oldPath.split('/').slice(0, -1).join('/') + '/';
+	//alert(newPath+fname);
+	a = document.createElement('a');
+    a.href =  fname; // Insted of calling setAttribute 
+    a.innerHTML = "Click Here for Log File" 
+	dl_div.appendChild(a);
+	dl_div.removeChild(a);
+	dl_div.appendChild(a);
+}
+
+function do_livemode()
+{
+
+	if ((mode==0) || ((mode==2) && (recstate<2)))
+	{
+		mode=1;
+		logstart_button.disabled=true;
+		logstop_button.disabled=true;
+		livemode_button.style.background="#00CC00";
+		logmode_button.style.background="#E6E6E6";
+		state_div.innerHTML='<p class="smalltext">Live</p>';
+		socket.emit('action', { command: 'gettemp' });
+	}
+}
+
+function do_logstart()
+{
+	var fname=file_box.value;
+	rxfilename=fname;
+	socket.emit('action', { command: 'logstart '+fname });
+	
+	// system should be logging now. Lets confirm:
+		var fname=file_box.value;
+		socket.emit('action', { command: 'checkstate '+rxfilename });
+}
+
+function do_logstop()
+{
+	var fname=file_box.value;
+	socket.emit('action', { command: 'logstop '+fname });
+}
+
+function do_logmode()
+{
+	if (mode==2)
+	{
+		var fname=file_box.value;
+		if (fname!=rxfilename)
+		{
+			rxfilename=fname;
+		}
+	}
+	if (mode==1)
+	{
+		mode=0;
+	}
+	
+	if (mode==0)
+	{	
+		mode=2;
+		recstate=0;
+		clear_display();
+		logstart_button.disabled=false;
+		logstop_button.disabled=false;
+		livemode_button.style.background="#E6E6E6";
+		logmode_button.style.background="#FF3300";
+		
+		// we don't know if the system is logging or not
+		var fname=file_box.value;
+		socket.emit('action', { command: 'checkstate '+rxfilename });
+		state_div.innerHTML='<p class="smalltext"> </p>';
+		
+		// now start receiving content periodically from the log file if it exists
+		rxfilename=file_box.value;
+		socket.emit('action', { command: 'readfile '+rxfilename });
+	}
+}
+
+
+function do_erase_marker()
+{
+  nx=0;
+  ny=0;
+  d3.select("#xc0").remove();
+  d3.select("#xc1").remove();
+  d3.select("#yc0").remove();
+  d3.select("#yc1").remove();
+  $('#id_period').val(" ");
+  $('#id_freq').val(" ");
+}
+
+function clear_radio()
+{
+	cont_button.style.background="#CCCCCC";
+	norm_button.style.background="#CCCCCC";
+	sing_button.style.background="#CCCCCC";
+}
+
+function do_trigmode(v)
+{
+	if ((init) && (queued==0))
+	{
+		queued=1;
+		queue='trigmode '+v;
+		//socket.emit('action', { command: 'trigmode '+v });
+		clear_radio();
+		if (v==0)
+		{
+			cont_button.style.background="#66FFFF";
+		}
+		else if (v==1)
+		{
+			norm_button.style.background="#66FFFF";
+		}
+		else if (v==2)
+		{
+			sing_button.style.background="#66FFFF";
+		}
+		trigmode=v;
+	}
+}
+
+
+
+function do_levelmode(v)
+{
+	if ((init) && (queued==0))
+	{
+		queued=1;
+		queue='trigdir '+v;
+	 	d3.select("#trigger1").remove();
+    	d3.select("#trigger2").remove();
+    	d3.select("#trigger3").remove();
+    	d3.select("#trigger4").remove();
+		trigdir=v;
+		drawtrigger();
+	}
+}
+
+
+
+var socket = io.connect();
+socket.on('status', function (data)
+{
+  if (data.stat=='ready')
+  {
+  	init=1;
+	//socket.emit('action', { command: 'gettemp' });
+	// we don't know if the system is logging or not
+	var fname=file_box.value;
+	rxfilename=fname;
+	socket.emit('action', { command: 'checkstate '+rxfilename });
+	//state_div.innerHTML='<p class="smalltext"> </p>';
+  }
+  
+});
+
+function doaction()
+{
+	if (mode==1)
+	{
+		socket.emit('action', { command: 'gettemp' });
+	}
+	else
+	{
+		clear_display();
+	}
+}
+
+function doreadfile()
+{
+	if (mode==2)
+	{
+		socket.emit('action', { command: 'readfile '+rxfilename });
+	}
+	else
+	{
+		clear_display();
+	}
+}
+
+// our first data to display
+var t;
+
+socket.on('results', function(tdata)
+{
+	//var temp = new Array();
+	//alert("Received "+tdata.toString());
+	var temp = tdata.toString().split(" ");
+	temp_div.innerHTML='<p class="bigtext">'+temp[1]+'&deg;C</p>';
+	time_div.innerHTML='<p class="medtext">'+temp[0]+'</p>';
+
+	t=setTimeout(doaction, 1000); // short delay and then lets get another measurement
+
+});
+
+socket.on('lastline', function(tdata)
+{
+	var temp = tdata.toString().split(",");
+	if (temp[0]=='finished')
+	{
+		// log file is unchanged
+		temp_div.innerHTML='<p class="bigtext">---.-&deg;C</p>';
+		time_div.innerHTML='<p class="medtext">--:--:--</p>';
+		//state_div.innerHTML='<p class="smalltext">-</p>';
+		recstate=0;
+	}
+	else
+	{
+		temp_div.innerHTML='<p class="bigtext">'+temp[2]+'&deg;C</p>';
+		time_div.innerHTML='<p class="medtext">'+temp[0]+'</p>';
+	}
+	
+	t=setTimeout(doreadfile, 1000); // short delay and then lets get another measurement
+
+});
+
+socket.on('stateresult', function(tdata)
+{
+	var temp = tdata.toString().split(" ");
+	if (temp[0]=='logging')
+	{
+		recstate=2;
+		state_div.innerHTML='<p class="smalltext">Logging</p>';
+		if (mode<2)
+		{
+			do_logmode();
+		}
+	}
+	else
+	{
+		state_div.innerHTML='<p class="smalltext">-</p>';
+		recstate=0;
+	}
+
+});
+
+
+</script>
+</body>
+</html>
