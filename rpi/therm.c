@@ -472,96 +472,92 @@ adc_code2temp(int code)	// transform ADC code for far-end to temperature.
 
 	temp = (float)code;
 
-	if (code > 0xFF6C && code <=0xFFB5)			//-30~-15
-	{
-		temp = (float)(15 * (temp - 0xFF6C)) / 0x0049 - 30.0f;
-	}
-	else if (code > 0xFFB5 && code <=0xFFFF)	//-15~0
-	{
-		temp = (float)(15 * (temp - 0xFFB5)) / 0x004B - 15.0f;
-	}
-	else if (code >=0 && code <=0x0019)			//0~5
-	{
-		temp = (float)(5 * (temp - 0)) / 0x0019;
-	}
-	else if (code >0x0019 && code <=0x0033)		//5~10
-	{
-		temp = (float)(5 * (temp - 0x0019)) / 0x001A + 5.0f;
-	}
-	else if (code >0x0033 && code <=0x0066)		//10~20
-	{
-		temp = (float)(10 * (temp - 0x0033)) / 0x0033 + 10.0f;
-	}
-	else if (code > 0x0066 && code <= 0x009A)	//20~30
-	{
-		temp = (float)(10 * (temp - 0x0066)) / 0x0034 + 20.0f;
-	}
-	else if (code > 0x009A && code <= 0x00CE)	//30~40
-	{
-		temp = (float)(10 * (temp - 0x009A)) / 0x0034 + 30.0f;
-	}
-	else if ( code > 0x00CE && code <= 0x0103)	//40~50
-	{
-		temp = (float)(10 * (temp - 0x00CE)) / 0x0035 + 40.0f;
-	}
-	else if ( code > 0x0103 && code <= 0x0138)	//50~60
-	{
-		temp = (float)(10 * (temp - 0x0103)) / 0x0035 + 50.0f;
-	}
-	else if (code > 0x0138 && code <=0x01A2)	//60~80
-	{
-		temp = (float)(20 * (temp - 0x0138)) / 0x006A + 60.0f;
-	}
-	else if (code > 0x01A2 && code <= 0x020C)	//80~100
-	{
-		temp = (float)((temp - 0x01A2) * 20)/ 0x06A + 80.0f;
-	}
-	else if (code > 0x020C && code <= 0x02DE)	//100~140
-	{
-		temp = (float)((temp - 0x020C) * 40)/ 0x0D2 + 100.0f;
-	}
-	else if (code > 0x02DE && code <= 0x03AC)	//140~180
-	{
-		temp = (float)((temp - 0x02DE) * 40)/ 0x00CE + 140.0f;
-	}
-	else if (code > 0x03AC && code <= 0x0478)	//180~220
-	{
-		temp = (float)((temp - 0x03AB) * 40) / 0x00CD + 180.0f;
-	}
-	else if (code > 0x0478 && code <= 0x0548)	//220~260
-	{
-		temp = (float)((temp - 0x0478) * 40) / 0x00D0 + 220.0f;
-	}
-	else if (code > 0x0548 && code <= 0x061B)	//260~300
-	{
-		temp = (float)((temp - 0x0548) * 40) / 0x00D3 + 260.0f;
-	}
-	else if (code > 0x061B && code <= 0x06F2)	//300~340
-	{
-		temp = (float)((temp - 0x061B) * 40) /  0x00D7 + 300.0f;
-	}
-	else if (code > 0x06F2 && code <= 0x07C7)	//340~400
-	{
-		temp =(float) ((temp - 0x06F2) *  40)  / 0x00D5 + 340.0f;
-	}
-	else if (code > 0x07C7 && code <= 0x089F)	//380~420
-	{
-		temp =(float) ((temp - 0x07C7) * 40)  / 0x00D8 + 380.0f;
-	}
 
-	else if (code > 0x089F && code <= 0x0978)	//420~460
-	{
-		temp = (float)((temp - 0x089F) * 40) / 0x00D9 + 420.0f;
-	}
-	else if (code > 0x0978 && code <=0x0A52)	//460~500
-	{
-		temp =(float)((temp - 0x0978) * 40) / 0x00DA + 460.0f;
-	}
-	else
-	{
-		temp = 0xA5A5;
-	}
+	if (code > 0xFCC6 && code < 0xFCC8) temp = (float)(10*(temp-0xFCC6)) / 0x0002 -270.0f;  // -270 C to -260 C
+	else if (code > 0xFCC8 && code < 0xFCCD) temp = (float)(10*(temp-0xFCC8)) / 0x0004 -260.0f;  // -260 C to -250 C
+	else if (code > 0xFCCD && code < 0xFCD4) temp = (float)(10*(temp-0xFCCD)) / 0x0007 -250.0f;  // -250 C to -240 C
+	else if (code > 0xFCD4 && code < 0xFCDF) temp = (float)(10*(temp-0xFCD4)) / 0x000A -240.0f;  // -240 C to -230 C
+	else if (code > 0xFCDF && code < 0xFCEC) temp = (float)(10*(temp-0xFCDF)) / 0x000D -230.0f;  // -230 C to -220 C
+	else if (code > 0xFCEC && code < 0xFCFC) temp = (float)(10*(temp-0xFCEC)) / 0x000F -220.0f;  // -220 C to -210 C
+	else if (code > 0xFCFC && code < 0xFD0E) temp = (float)(10*(temp-0xFCFC)) / 0x0012 -210.0f;  // -210 C to -200 C
+	else if (code > 0xFD0E && code < 0xFD23) temp = (float)(10*(temp-0xFD0E)) / 0x0014 -200.0f;  // -200 C to -190 C
+	else if (code > 0xFD23 && code < 0xFD3A) temp = (float)(10*(temp-0xFD23)) / 0x0017 -190.0f;  // -190 C to -180 C
+	else if (code > 0xFD3A && code < 0xFD53) temp = (float)(10*(temp-0xFD3A)) / 0x0019 -180.0f;  // -180 C to -170 C
+	else if (code > 0xFD53 && code < 0xFD6E) temp = (float)(10*(temp-0xFD53)) / 0x001B -170.0f;  // -170 C to -160 C
+	else if (code > 0xFD6E && code < 0xFD8C) temp = (float)(10*(temp-0xFD6E)) / 0x001D -160.0f;  // -160 C to -150 C
+	else if (code > 0xFD8C && code < 0xFDAB) temp = (float)(10*(temp-0xFD8C)) / 0x001F -150.0f;  // -150 C to -140 C
+	else if (code > 0xFDAB && code < 0xFDCC) temp = (float)(10*(temp-0xFDAB)) / 0x0021 -140.0f;  // -140 C to -130 C
+	else if (code > 0xFDCC && code < 0xFDEF) temp = (float)(10*(temp-0xFDCC)) / 0x0022 -130.0f;  // -130 C to -120 C
+	else if (code > 0xFDEF && code < 0xFE13) temp = (float)(10*(temp-0xFDEF)) / 0x0024 -120.0f;  // -120 C to -110 C
+	else if (code > 0xFE13 && code < 0xFE3A) temp = (float)(10*(temp-0xFE13)) / 0x0026 -110.0f;  // -110 C to -100 C
+	else if (code > 0xFE3A && code < 0xFE61) temp = (float)(10*(temp-0xFE3A)) / 0x0027 -100.0f;  // -100 C to  -90 C
+	else if (code > 0xFE61 && code < 0xFE8B) temp = (float)(10*(temp-0xFE61)) / 0x0029 -90.0f;  //  -90 C to  -80 C
+	else if (code > 0xFE8B && code < 0xFEB5) temp = (float)(10*(temp-0xFE8B)) / 0x002A -80.0f;  //  -80 C to  -70 C
+	else if (code > 0xFEB5 && code < 0xFEE1) temp = (float)(10*(temp-0xFEB5)) / 0x002C -70.0f;  //  -70 C to  -60 C
+	else if (code > 0xFEE1 && code < 0xFF0F) temp = (float)(10*(temp-0xFEE1)) / 0x002D -60.0f;  //  -60 C to  -50 C
+	else if (code > 0xFF0F && code < 0xFF3D) temp = (float)(10*(temp-0xFF0F)) / 0x002E -50.0f;  //  -50 C to  -40 C
+	else if (code > 0xFF3D && code < 0xFF6D) temp = (float)(10*(temp-0xFF3D)) / 0x002F -40.0f;  //  -40 C to  -30 C
+	else if (code > 0xFF6D && code < 0xFF9D) temp = (float)(10*(temp-0xFF6D)) / 0x0030 -30.0f;  //  -30 C to  -20 C
+	else if (code > 0xFF9D && code < 0xFFCE) temp = (float)(10*(temp-0xFF9D)) / 0x0031 -20.0f;  //  -20 C to  -10 C
+	else if (code > 0xFFCE && code < 0x0000) temp = (float)(10*(temp-0xFFCE)) / 0x0032 -10.0f;  //  -10 C to    0 C
+	else if (code > 0x0000 && code < 0x0032) temp = (float)(10*(temp-0x0000)) / 0x0032 + 0.0f;  //    0 C to   10 C
+	else if (code > 0x0032 && code < 0x0066) temp = (float)(10*(temp-0x0032)) / 0x0033 + 10.0f;  //   10 C to   20 C
+	else if (code > 0x0066 && code < 0x0099) temp = (float)(10*(temp-0x0066)) / 0x0033 + 20.0f;  //   20 C to   30 C
+	else if (code > 0x0099 && code < 0x00CE) temp = (float)(10*(temp-0x0099)) / 0x0034 + 30.0f;  //   30 C to   40 C
+	else if (code > 0x00CE && code < 0x0102) temp = (float)(10*(temp-0x00CE)) / 0x0034 + 40.0f;  //   40 C to   50 C
+	else if (code > 0x0102 && code < 0x0137) temp = (float)(10*(temp-0x0102)) / 0x0034 + 50.0f;  //   50 C to   60 C
+	else if (code > 0x0137 && code < 0x016C) temp = (float)(10*(temp-0x0137)) / 0x0035 + 60.0f;  //   60 C to   70 C
+	else if (code > 0x016C && code < 0x01A2) temp = (float)(10*(temp-0x016C)) / 0x0035 + 70.0f;  //   70 C to   80 C
+	else if (code > 0x01A2 && code < 0x01D7) temp = (float)(10*(temp-0x01A2)) / 0x0035 + 80.0f;  //   80 C to   90 C
+	else if (code > 0x01D7 && code < 0x020C) temp = (float)(10*(temp-0x01D7)) / 0x0034 + 90.0f;  //   90 C to  100 C
+	else if (code > 0x020C && code < 0x0241) temp = (float)(10*(temp-0x020C)) / 0x0034 + 100.0f;  //  100 C to  110 C
+	else if (code > 0x0241 && code < 0x0275) temp = (float)(10*(temp-0x0241)) / 0x0034 + 110.0f;  //  110 C to  120 C
+	else if (code > 0x0275 && code < 0x02A9) temp = (float)(10*(temp-0x0275)) / 0x0034 + 120.0f;  //  120 C to  130 C
+	else if (code > 0x02A9 && code < 0x02DE) temp = (float)(10*(temp-0x02A9)) / 0x0034 + 130.0f;  //  130 C to  140 C
+	else if (code > 0x02DE && code < 0x0311) temp = (float)(10*(temp-0x02DE)) / 0x0033 + 140.0f;  //  140 C to  150 C
+	else if (code > 0x0311 && code < 0x0345) temp = (float)(10*(temp-0x0311)) / 0x0033 + 150.0f;  //  150 C to  160 C
+	else if (code > 0x0345 && code < 0x0378) temp = (float)(10*(temp-0x0345)) / 0x0033 + 160.0f;  //  160 C to  170 C
+	else if (code > 0x0378 && code < 0x03AB) temp = (float)(10*(temp-0x0378)) / 0x0033 + 170.0f;  //  170 C to  180 C
+	else if (code > 0x03AB && code < 0x03DE) temp = (float)(10*(temp-0x03AB)) / 0x0033 + 180.0f;  //  180 C to  190 C
+	else if (code > 0x03DE && code < 0x0411) temp = (float)(10*(temp-0x03DE)) / 0x0033 + 190.0f;  //  190 C to  200 C
+	else if (code > 0x0411 && code < 0x0444) temp = (float)(10*(temp-0x0411)) / 0x0033 + 200.0f;  //  200 C to  210 C
+	else if (code > 0x0444 && code < 0x0478) temp = (float)(10*(temp-0x0444)) / 0x0033 + 210.0f;  //  210 C to  220 C
+	else if (code > 0x0478 && code < 0x04AB) temp = (float)(10*(temp-0x0478)) / 0x0033 + 220.0f;  //  220 C to  230 C
+	else if (code > 0x04AB && code < 0x04DF) temp = (float)(10*(temp-0x04AB)) / 0x0033 + 230.0f;  //  230 C to  240 C
+	else if (code > 0x04DF && code < 0x0513) temp = (float)(10*(temp-0x04DF)) / 0x0033 + 240.0f;  //  240 C to  250 C
+	else if (code > 0x0513 && code < 0x0547) temp = (float)(10*(temp-0x0513)) / 0x0034 + 250.0f;  //  250 C to  260 C
+	else if (code > 0x0547 && code < 0x057C) temp = (float)(10*(temp-0x0547)) / 0x0034 + 260.0f;  //  260 C to  270 C
+	else if (code > 0x057C && code < 0x05B0) temp = (float)(10*(temp-0x057C)) / 0x0034 + 270.0f;  //  270 C to  280 C
+	else if (code > 0x05B0 && code < 0x05E5) temp = (float)(10*(temp-0x05B0)) / 0x0034 + 280.0f;  //  280 C to  290 C
+	else if (code > 0x05E5 && code < 0x061A) temp = (float)(10*(temp-0x05E5)) / 0x0034 + 290.0f;  //  290 C to  300 C
+	else if (code > 0x061A && code < 0x064F) temp = (float)(10*(temp-0x061A)) / 0x0035 + 300.0f;  //  300 C to  310 C
+	else if (code > 0x064F && code < 0x0685) temp = (float)(10*(temp-0x064F)) / 0x0035 + 310.0f;  //  310 C to  320 C
+	else if (code > 0x0685 && code < 0x06BA) temp = (float)(10*(temp-0x0685)) / 0x0035 + 320.0f;  //  320 C to  330 C
+	else if (code > 0x06BA && code < 0x06EF) temp = (float)(10*(temp-0x06BA)) / 0x0035 + 330.0f;  //  330 C to  340 C
+	else if (code > 0x06EF && code < 0x0725) temp = (float)(10*(temp-0x06EF)) / 0x0035 + 340.0f;  //  340 C to  350 C
+	else if (code > 0x0725 && code < 0x075B) temp = (float)(10*(temp-0x0725)) / 0x0035 + 350.0f;  //  350 C to  360 C
+	else if (code > 0x075B && code < 0x0791) temp = (float)(10*(temp-0x075B)) / 0x0035 + 360.0f;  //  360 C to  370 C
+	else if (code > 0x0791 && code < 0x07C6) temp = (float)(10*(temp-0x0791)) / 0x0035 + 370.0f;  //  370 C to  380 C
+	else if (code > 0x07C6 && code < 0x07FC) temp = (float)(10*(temp-0x07C6)) / 0x0035 + 380.0f;  //  380 C to  390 C
+	else if (code > 0x07FC && code < 0x0832) temp = (float)(10*(temp-0x07FC)) / 0x0036 + 390.0f;  //  390 C to  400 C
+	else if (code > 0x0832 && code < 0x0868) temp = (float)(10*(temp-0x0832)) / 0x0036 + 400.0f;  //  400 C to  410 C
+	else if (code > 0x0868 && code < 0x089F) temp = (float)(10*(temp-0x0868)) / 0x0036 + 410.0f;  //  410 C to  420 C
+	else if (code > 0x089F && code < 0x08D5) temp = (float)(10*(temp-0x089F)) / 0x0036 + 420.0f;  //  420 C to  430 C
+	else if (code > 0x08D5 && code < 0x090B) temp = (float)(10*(temp-0x08D5)) / 0x0036 + 430.0f;  //  430 C to  440 C
+	else if (code > 0x090B && code < 0x0942) temp = (float)(10*(temp-0x090B)) / 0x0036 + 440.0f;  //  440 C to  450 C
+	else if (code > 0x0942 && code < 0x0978) temp = (float)(10*(temp-0x0942)) / 0x0036 + 450.0f;  //  450 C to  460 C
+	else if (code > 0x0978 && code < 0x09AE) temp = (float)(10*(temp-0x0978)) / 0x0036 + 460.0f;  //  460 C to  470 C
+	else if (code > 0x09AE && code < 0x09E5) temp = (float)(10*(temp-0x09AE)) / 0x0036 + 470.0f;  //  470 C to  480 C
+	else if (code > 0x09E5 && code < 0x0A1B) temp = (float)(10*(temp-0x09E5)) / 0x0036 + 480.0f;  //  480 C to  490 C
+	else if (code > 0x0A1B && code < 0x0A52) temp = (float)(10*(temp-0x0A1B)) / 0x0036 + 490.0f;  //  490 C to  500 C
 
+    // set temperature to 9999 C if off scale
+    else
+        return (int)(10*0x270F);
+
+    // apply a slope and intercept correction to the temperature
+
+	//t = (int)((10*temp+0.2455)/1.0018f);
 	t = (int)(10*temp);
 
 	return t;
@@ -909,7 +905,9 @@ main(int argc, char* argv[])
 			}
 			desiredtime=desiredtime+period;
 		}
-		sprintf(tstring, "%s %#.1f", tstring2, tval);
+		//sprintf(tstring, "%s %#.1f", tstring2, tval);
+		lcd_clear();
+        sprintf(tstring, "%7.1f", tval);
 		lcd_display_string(1, tstring);
 		// now we sleep for a certain time
 		mytime++;
